@@ -17,17 +17,17 @@ namespace dotnet_entrance_test.Repository
             this.dbSet = _context.Set<T>();
         }
 
-        public void Add(T entity)
+        public void AddAsync(T entity)
         {
-            dbSet.Add(entity);
+            dbSet.AddAsync(entity);
         }
 
-        public bool Any(Expression<Func<T, bool>> filter)
+        public async Task<bool> AnyAsync(Expression<Func<T, bool>> filter)
         {
-            return dbSet.Any(filter);
+            return await dbSet.AnyAsync(filter);
         }
 
-        public IEnumerable<T> Get(Expression<Func<T, bool>>? filter = null, string? includeProperties = null)
+        public async Task<IEnumerable<T>> GetAsync(Expression<Func<T, bool>>? filter = null, string? includeProperties = null)
         {
             IQueryable<T> query = dbSet;
             if (filter != null)
@@ -43,7 +43,7 @@ namespace dotnet_entrance_test.Repository
                 }
             }
 
-            return query.ToList();
+            return await query.ToListAsync();
         }
 
         public void Remove(T entity)

@@ -17,9 +17,9 @@ namespace dotnet_entrance_test.Repository
         public IBookRepository Book { get; private set; }
         public IAuthorRepository Author { get; private set; }
 
-        public void Save()
+        public void SaveAsync()
         {
-            _context.SaveChanges();
+            _context.SaveChangesAsync();
         }
     }
 }

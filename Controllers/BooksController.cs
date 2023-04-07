@@ -20,7 +20,7 @@ namespace dotnet_entrance_test.Controllers
         }
 
         [HttpGet]
-        public IActionResult Get(int? authorId, int? rating, int? publishYear)
+        public async Task<IActionResult> Get(int? authorId, int? rating, int? publishYear)
         {
             if (Request.Query.Count > 0)
                 foreach (var item in Request.Query)
@@ -31,7 +31,7 @@ namespace dotnet_entrance_test.Controllers
 
             try
             {
-                var books = _unitOfWork.Book.Get(includeProperties: "Author");
+                var books = await _unitOfWork.Book.GetAsync(includeProperties: "Author");
                 if (authorId != null) { books = books.Where(x => x.AuthorId == authorId); }
                 if (rating != null) { books = books.Where(x => x.Rating == rating); }
                 if (publishYear != null) { books = books.Where(x => x.PublishYear == publishYear); }
@@ -45,25 +45,25 @@ namespace dotnet_entrance_test.Controllers
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetBook(int id)
+        public async Task<IActionResult> GetBook(int id)
         {
-            var book = _unitOfWork.Book.GetBook(id);
+            var book = await _unitOfWork.Book.GetBook(id);
             if (book == null)
                 return StatusCode(StatusCodes.Status404NotFound, "");
             else return Ok(book);
         }
 
         [HttpPost]
-        public IActionResult AddBook(Book book)
+        public async Task<IActionResult> AddBook(Book book)
         {
             if (book != null && ModelState.IsValid)
             {
-                if (_unitOfWork.Book.Any(x => x.Title == book.Title))
+                if (await _unitOfWork.Book.AnyAsync(x => x.Title == book.Title))
                     return BadRequest(new { message = "There are already other items in the database with the same name." });
-                if (!_unitOfWork.Author.Any(x => x.Id == book.AuthorId))
+                if (!await _unitOfWork.Author.AnyAsync(x => x.Id == book.AuthorId))
                     return BadRequest(new { message = "Author is not found." });
-                _unitOfWork.Book.Add(book);
-                _unitOfWork.Save();
+                _unitOfWork.Book.AddAsync(book);
+                _unitOfWork.SaveAsync();
                 return Ok();
             }
             else
@@ -73,7 +73,7 @@ namespace dotnet_entrance_test.Controllers
         }
 
         [HttpPut("{id}")]
-        public IActionResult UpdateBook(int id, Book book)
+        public async Task<IActionResult> UpdateBook(int id, Book book)
         {
             if (id != book.Id)
             {
@@ -84,17 +84,17 @@ namespace dotnet_entrance_test.Controllers
             {
                 try
                 {
-                    if (!_unitOfWork.Author.Any(x => x.Id == book.AuthorId))
+                    if (!await _unitOfWork.Author.AnyAsync(x => x.Id == book.AuthorId))
                         return BadRequest(new { message = "Author is not found." });
                     _unitOfWork.Book.Update(book);
-                    _unitOfWork.Save();
+                    _unitOfWork.SaveAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!_unitOfWork.Book.Any(x => x.Id == book.Id)) return NotFound();
+                    if (!await _unitOfWork.Book.AnyAsync(x => x.Id == book.Id)) return NotFound();
                     else throw;
                 }
-                var json = _unitOfWork.Book.GetBook(id);
+                var json = await _unitOfWork.Book.GetBook(id);
                 return Ok(json);
             }
             else
@@ -104,13 +104,13 @@ namespace dotnet_entrance_test.Controllers
         }
 
         [HttpDelete("{id}")]
-        public IActionResult DeleteBook(int id)
+        public async Task<IActionResult> DeleteBook(int id)
         {
-            if (_unitOfWork.Book.Any(x => x.Id == id))
+            if (await _unitOfWork.Book.AnyAsync(x => x.Id == id))
             {
-                Book book = _unitOfWork.Book.GetBook(id);
+                Book book = await _unitOfWork.Book.GetBook(id);
                 _unitOfWork.Book.Remove(book);
-                _unitOfWork.Save();
+                _unitOfWork.SaveAsync();
                 return Ok();
 
             }

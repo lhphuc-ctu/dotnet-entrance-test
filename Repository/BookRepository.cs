@@ -15,9 +15,9 @@ namespace dotnet_entrance_test.Repository
             if (_context.Books.Count() == 0) AddBookData();
         }
 
-        public Book GetBook(int id)
+        public async Task<Book> GetBook(int id)
         {
-            return _context.Books.Where(x => x.Id == id).Include(x => x.Author).First();
+            return await _context.Books.Where(x => x.Id == id).Include(x => x.Author).FirstAsync();
         }
 
         public void Update(Book book)

@@ -1,9 +1,12 @@
-﻿using dotnet_entrance_test.Model.JsonModel;
+﻿using dotnet_entrance_test.Model;
+using dotnet_entrance_test.Model.JsonModel;
 using dotnet_entrance_test.Repository.IRepository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace dotnet_entrance_test.Controllers
 {
+    [Authorize(Roles =UserRoles.Admin)]
     [ApiController]
     [Route("api/[controller]")]
     public class AuthorsController : Controller
@@ -19,16 +22,16 @@ namespace dotnet_entrance_test.Controllers
         }
 
         [HttpGet]
-        public IActionResult Get()
+        public async Task<IActionResult> Get()
         {
             if (Request.Query.Count > 0)
                 return BadRequest(new { message = "Error: Bad Query Request" });
 
-            var authors = _unitOfWork.Author.Get();
-            List<JsonAuthor> authorList = new List<JsonAuthor>();
+            var authors = await _unitOfWork.Author.GetAsync();
+            List<AuthorModel> authorList = new List<AuthorModel>();
             foreach (var author in authors)
             {
-                JsonAuthor jsonAuthor = new JsonAuthor()
+                AuthorModel jsonAuthor = new AuthorModel()
                 {
                     Id = author.Id,
                     Name = author.Name,

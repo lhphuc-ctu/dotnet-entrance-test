@@ -1,6 +1,6 @@
 ﻿namespace dotnet_entrance_test.Model.JsonModel
 {
-    public class JsonAuthor
+    public class AuthorModel
     {
         public int Id { get; set; }
         public string? Name { get; set; }
