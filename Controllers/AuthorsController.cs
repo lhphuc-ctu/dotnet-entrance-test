@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace dotnet_entrance_test.Controllers
 {
-    [Authorize(Roles =UserRoles.Admin)]
     [ApiController]
     [Route("api/[controller]")]
     public class AuthorsController : Controller
